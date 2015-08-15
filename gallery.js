@@ -66,6 +66,9 @@ var Photos = React.createClass({
         var photos = this.state.content.map(function (x) {
             return (<Photo data={x}/>);
         });
+        if (photos.length == 0) {
+            photos = this.state.currentUrl ? (<p>Empty...</p>) : (<p>Loading...</p>);
+        }
         return (
             <div>
                 <h3>Photos</h3>
