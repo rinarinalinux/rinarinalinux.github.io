@@ -21,7 +21,8 @@ h1, h2, h3 {
 }
 
 h1 {
-  font-size:36px;
+  font-size:40px;
+  padding-left: 25px;
 }
 
 h2 {
@@ -183,6 +184,10 @@ footer {
   float:left;
   position:fixed;
   bottom:50px;
+}
+
+address {
+  font-style: normal;
 }
 
 @media print, screen and (max-width: 960px) {
