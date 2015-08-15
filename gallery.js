@@ -93,8 +93,7 @@ var Photo = React.createClass({
                 <table>
                     <tr>
                         <td>
-                            <a href={this.props.data.url} target="_blank"><img
-                                src={this.props.data.largeThumbnail}/></a>
+                            <img src={this.props.data.largeThumbnail}/>
                         </td>
                         <td>
                             <dl>
