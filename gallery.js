@@ -123,14 +123,8 @@ var Genres = React.createClass({
             }.bind(this));
     },
     render: function () {
-        var links = {};
-        for (var i = 0; i < this.state._links.length; i++) {
-            var l = this.state._links[i];
-            links[l.rel] = l.href;
-        }
-        var genres = this.state.content.map(function (x) {
+        var genres = this.state._links.map(function (x) {
             return (<Genre data={x}
-                           link={links[x.genreName]}
                            onGenreChange={this.props.onGenreChange}/>);
         }.bind(this));
         return (
@@ -145,10 +139,10 @@ var Genres = React.createClass({
 
 var Genre = React.createClass({
     onClick: function () {
-        this.props.onGenreChange(this.props.link);
+        this.props.onGenreChange(this.props.data.href);
     },
     render: function () {
-        return (<li><a href="#" onClick={this.onClick}>{this.props.data.genreName}</a></li>);
+        return (<li><a href="#" onClick={this.onClick}>{this.props.data.rel}</a></li>);
     }
 });
 
