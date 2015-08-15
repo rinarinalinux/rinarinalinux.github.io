@@ -102,10 +102,8 @@ var Photo = React.createClass({
                                 <dd>{this.props.data.genre.genreName}</dd>
                                 <dt>Comment</dt>
                                 <dd>{this.props.data.comment}</dd>
-                                <dt>Published</dt>
-                                <dd>{new Date(this.props.data.published).toLocaleString()}</dd>
-                                <dt>Updated</dt>
-                                <dd>{new Date(this.props.data.updated).toLocaleString()}</dd>
+                                <dt>Shooting Date</dt>
+                                <dd>{new Date(this.props.data.published).getFullYear() + '/' + (new Date(this.props.data.published).getMonth() + 1)}</dd>
                             </dl>
                         </td>
                     </tr>
