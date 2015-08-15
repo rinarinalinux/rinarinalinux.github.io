@@ -1,5 +1,5 @@
 var request = window.superagent;
-var API_HOST = window.PC.API_HOST || 'http://picasa-connect.cfapps.io';
+var API_HOST = window.PC.API_HOST || '//picasa-connect.cfapps.io';
 var USER_ID = window.PC.USER_ID;
 var Modal = window.ReactModal;
 var appElement = window.PC.APP_ELEMENT || document.getElementById('gallery');
