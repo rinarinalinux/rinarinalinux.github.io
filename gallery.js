@@ -1,7 +1,6 @@
 var request = window.superagent;
-//var API_HOST = 'http://vast-tor-8520.herokuapp.com';
 var API_HOST = 'http://picasa-connect.cfapps.io';
-var USER_ID = '100851576803920751047';
+var USER_ID = '105738321969161413623';
 var Modal = window.ReactModal;
 var appElement = document.getElementById('gallery');
 
