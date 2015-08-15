@@ -1,5 +1,5 @@
 var request = window.superagent;
-var API_HOST = window.PC.API_HOST || '//picasa-connect.cfapps.io';
+var API_HOST = window.PC.API_HOST || '//picasa-connect.ik.am';
 var USER_ID = window.PC.USER_ID;
 var PAGE_SIZE = window.PC.PAGE_SIZE || 96;
 var Modal = window.ReactModal;
