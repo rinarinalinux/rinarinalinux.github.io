@@ -49,7 +49,7 @@ var Photos = React.createClass({
     },
     loadFromServer: function (url) {
         PhotosModel.get(url)
-            .query({size: 12})
+            .query({size: 96})
             .end(function (err, res) {
                 var state = res.body;
                 state.currentUrl = url;
