@@ -1,6 +1,7 @@
 var request = window.superagent;
 var API_HOST = window.PC.API_HOST || '//picasa-connect.cfapps.io';
 var USER_ID = window.PC.USER_ID;
+var PAGE_SIZE = window.PC.PAGE_SIZE || 96;
 var Modal = window.ReactModal;
 var appElement = window.PC.APP_ELEMENT || document.getElementById('gallery');
 
@@ -48,7 +49,7 @@ var Photos = React.createClass({
     },
     loadFromServer: function (url) {
         PhotosModel.get(url)
-            .query({size: 96})
+            .query({size: PAGE_SIZE})
             .end(function (err, res) {
                 var state = res.body;
                 state.currentUrl = url;
