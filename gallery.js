@@ -139,7 +139,11 @@ var Genres = React.createClass({
 
 var Genre = React.createClass({
     onClick: function () {
-        this.props.onGenreChange(this.props.data.href);
+        var href = this.props.data.href;
+        if (location.protocol === 'https:') {
+            href = href.replace('http:', 'https:');
+        }
+        this.props.onGenreChange(href);
     },
     render: function () {
         return (<li><a href="#" onClick={this.onClick}>{this.props.data.rel}</a></li>);
