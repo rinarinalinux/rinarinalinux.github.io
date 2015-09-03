@@ -4,74 +4,124 @@ var USER_ID = window.PC.USER_ID;
 var PAGE_SIZE = window.PC.PAGE_SIZE || 96;
 var Modal = window.ReactModal;
 var appElement = window.PC.APP_ELEMENT || document.getElementById('gallery');
+var Fluxxor = window.Fluxxor;
 
 Modal.setAppElement(appElement);
 Modal.injectCSS();
 
-var PhotosModel = {
+
+// Client
+var PhotosClient = {
     get: function (url) {
         url = url || API_HOST + '/api/users/' + USER_ID + '/photos';
         return request.get(url);
     }
 };
-var GenresModel = {
+var GenresClient = {
     get: function () {
         return request.get(API_HOST + '/api/users/' + USER_ID + '/genres');
     }
 };
 
+var constants = {
+    LOAD_PHOTOS: 'LOAD_PHOTOS',
+    CHANGE_GENRE: 'CHANGE_GENRE'
+};
+
+// Store
+var PhotosStore = Fluxxor.createStore({
+    initialize: function () {
+        this.page = 0;
+        this.size = PAGE_SIZE;
+        this.photos = {
+            content: [],
+            first: true,
+            last: true,
+            number: this.page,
+            size: 10,
+            totalPages: 1
+        };
+        this.loading = true;
+
+        this.bindActions(constants.LOAD_PHOTOS, this.onLoadPhotos);
+        this.bindActions(constants.CHANGE_GENRE, this.onLoadPhotos);
+    },
+    onLoadPhotos: function (payload) {
+        this.loading = true;
+        this.genre = payload.genre;
+        this.emit('change');
+
+        PhotosClient.get(payload.link)
+            .query({
+                page: this.page,
+                size: this.size
+            })
+            .end(function (err, res) {
+                this.photos = res.body;
+                this.loading = false;
+                this.emit('change');
+            }.bind(this));
+    },
+    getState: function () {
+        return {
+            genre: this.genre,
+            photos: this.photos,
+            loading: this.loading
+        };
+    }
+});
+
+// Action
+var actions = {
+    loadPhotos: function (link) {
+        this.dispatch(constants.LOAD_PHOTOS, {
+            link: link
+        });
+    },
+    changeGenre: function (link, genre) {
+        this.dispatch(constants.CHANGE_GENRE, {
+            link: link,
+            genre: genre
+        });
+    }
+};
+
+// View
+var FluxMixin = Fluxxor.FluxMixin(React),
+    StoreWatchMixin = Fluxxor.StoreWatchMixin;
+
 var Gallery = React.createClass({
-    getInitialState: function () {
-        return {url: null};
-    },
-    setUrl: function (url) {
-        this.setState({url: url});
-    },
+    mixins: [FluxMixin],
     render: function () {
         return (
             <div>
-                <Photos url={this.state.url}/>
-                <Genres onGenreChange={this.setUrl}/>
+                <Photos />
+                <Genres />
             </div>);
     }
 });
 
 var Photos = React.createClass({
-    getInitialState: function () {
-        return {
-            content: [],
-            first: true,
-            last: true,
-            number: 0,
-            size: 10,
-            totalPages: 1
-        };
-    },
-    loadFromServer: function (url) {
-        PhotosModel.get(url)
-            .query({size: PAGE_SIZE})
-            .end(function (err, res) {
-                var state = res.body;
-                state.currentUrl = url;
-                this.setState(state);
-            }.bind(this));
+    mixins: [FluxMixin, StoreWatchMixin('PhotosStore')],
+    getStateFromFlux: function () {
+        return this.getFlux()
+            .store('PhotosStore')
+            .getState();
     },
     componentDidMount: function () {
-        this.loadFromServer();
+        this.getFlux().actions.loadPhotos();
     },
     render: function () {
-        if (this.props.url && this.props.url !== this.state.currentUrl) {
-            this.loadFromServer(this.props.url);
-        }
-        var photos = this.state.content.map(function (x) {
+        var photos = this.state.photos.content.map(function (x) {
             return (<Photo data={x}/>);
         });
         if (photos.length == 0) {
-            photos = this.state.currentUrl ? (<p>Empty...</p>) : (<p>Loading...</p>);
+            photos = this.state.loading ? (<p>Loading...</p>) : (<p>Empty...</p>);
         }
         return (
             <div>
                 <h3>Photos</h3>
+                <h4>{this.state.genre}</h4>
                 {photos}
             </div>);
     }
@@ -121,15 +171,14 @@ var Genres = React.createClass({
         return {content: [], _links: []};
     },
     componentDidMount: function () {
-        GenresModel.get()
+        GenresClient.get()
             .end(function (err, res) {
                 this.setState(res.body);
             }.bind(this));
     },
     render: function () {
         var genres = this.state._links.map(function (x) {
-            return (<Genre data={x}
-                           onGenreChange={this.props.onGenreChange}/>);
+            return (<Genre data={x}/>);
         }.bind(this));
         return (
             <div className="clear">
@@ -142,18 +191,20 @@ var Genres = React.createClass({
 });
 
 var Genre = React.createClass({
+    mixins: [FluxMixin],
     onClick: function () {
         var href = this.props.data.href;
         if (location.protocol === 'https:') {
             href = href.replace('http:', 'https:');
         }
-        this.props.onGenreChange(href);
+        this.getFlux().actions.changeGenre(href, this.props.data.rel);
     },
     render: function () {
         return (<li><a href="#" onClick={this.onClick}>{this.props.data.rel}</a></li>);
     }
 });
 
-
-React.render(<Gallery />, appElement);
+var stores = {PhotosStore: new PhotosStore()};
+var flux = new Fluxxor.Flux(stores, actions);
+React.render(<Gallery flux={flux}/>, appElement);
 
