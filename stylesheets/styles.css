@@ -190,6 +190,10 @@ address {
   font-style: normal;
 }
 
+section > ul > li {
+  margin-top: 15px;
+}
+
 @media print, screen and (max-width: 960px) {
 
   div.wrapper {
