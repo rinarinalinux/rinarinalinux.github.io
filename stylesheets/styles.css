@@ -190,8 +190,20 @@ address {
   font-style: normal;
 }
 
-section > ul > li {
-  margin-top: 15px;
+section > dl {
+  margin-left: 15px;
+}
+
+section > h3 {
+  margin-left: 10px;
+  border-bottom-style: dashed;
+  border-bottom-width: thin;
+  border-bottom-color: #D3D3D3;
+  padding-bottom: 7px;
+}
+
+section > dl > dd > ul {
+  margin-left: -50px;
 }
 
 @media print, screen and (max-width: 960px) {
