@@ -112,8 +112,26 @@ var Photos = React.createClass({
         this.getFlux().actions.loadPhotos();
     },
     render: function () {
-        var photos = this.state.photos.content.map(function (x) {
+        var info = [];
+        for (var i = 0, len = this.state.photos.content.length; i < len; i++) {
+            info[i] = this.state.photos.content[i];
+            if (i == len - 1) {
+                info[i]._next = 0;
+            } else {
+                info[i]._next = i + 1;
+            }
+            if (i == 0) {
+                info[i]._prev = len - 1;
+            } else {
+                info[i]._prev = i - 1;
+            }
+        }
+
+        var photos = info.map(function (x) {
             return (<Photo data={x}/>);
+        });
+        photos.forEach(function (p) {
+            p.props.photos = photos; // bad hack
         });
         if (photos.length == 0) {
             photos = this.state.loading ? (<p>Loading...</p>) : (<p>Empty...</p>);
@@ -129,6 +147,7 @@ var Photos = React.createClass({
 
 var Photo = React.createClass({
     getInitialState: function () {
+        this.props.instance = this; // bad hack
         return {modalIsOpen: false};
     },
     openModal: function () {
@@ -138,12 +157,24 @@ var Photo = React.createClass({
     closeModal: function () {
         this.setState({modalIsOpen: false});
     },
+    showNext: function () {
+        var next = this.props.photos[this.props.data._next];
+        this.closeModal();
+        next.props.instance.openModal();
+    },
+    showPrev: function () {
+        var prev = this.props.photos[this.props.data._prev];
+        this.closeModal();
+        prev.props.instance.openModal();
+    },
     render: function () {
         return (<span>
             <img className="cut" src={this.props.data.smallThumbnail} onClick={this.openModal}/>
             <Modal isOpen={this.state.modalIsOpen} onRequestClose={this.closeModal}>
                 <h2>{this.props.data.title}</h2>
-                <button onClick={this.closeModal}>close</button>
+                <button onClick={this.showPrev}>&lt; Prev</button>
+                <button onClick={this.showNext}>Next &gt;</button>
+                <button onClick={this.closeModal}>Close</button>
                 <table>
                     <tr>
                         <td>
